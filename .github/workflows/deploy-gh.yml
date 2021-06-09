@@ -34,5 +34,4 @@ jobs:
         with: 
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: master
-          FOLDER: build
-          BUILD_SCRIPT: yarn install && yarn docs:build
+          FOLDER: docs/.vuepress/dist
