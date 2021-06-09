@@ -29,7 +29,7 @@ jobs:
       - run: yarn docs:build
 
       - name: deploy
-      - name: deploy yangtao00.github.io/blog.git master
+      - name: deploy git@github.com:yangtao00/yangtao00.github.io.git master
         uses: amesIves/github-pages-deploy-action@releases/v3
         with: 
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
