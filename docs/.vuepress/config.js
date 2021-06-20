@@ -1,7 +1,6 @@
 module.exports = {
-  title: '我的博客',
   description: '我的博客',
-  base: '/blob/',
+  base: '/blog/',
   themeConfig: {
     sidebarDepth: 3,
     sidebar: [
