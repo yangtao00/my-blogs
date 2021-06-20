@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>ref、reactive问题 | 我的博客</title>
+    <meta name="generator" content="VuePress 1.8.2">
+    
+    <meta name="description" content="我的博客">
+    
+    <link rel="preload" href="/my-blogs/assets/css/0.styles.10c441db.css" as="style"><link rel="preload" href="/my-blogs/assets/js/app.2d578ef6.js" as="script"><link rel="preload" href="/my-blogs/assets/js/2.af5caeff.js" as="script"><link rel="preload" href="/my-blogs/assets/js/9.a68b762a.js" as="script"><link rel="prefetch" href="/my-blogs/assets/js/3.187d161f.js"><link rel="prefetch" href="/my-blogs/assets/js/4.e7c996f5.js"><link rel="prefetch" href="/my-blogs/assets/js/5.6eff8140.js"><link rel="prefetch" href="/my-blogs/assets/js/6.17d5dd20.js"><link rel="prefetch" href="/my-blogs/assets/js/7.ad8335a7.js"><link rel="prefetch" href="/my-blogs/assets/js/8.3fe14e2e.js">
+    <link rel="stylesheet" href="/my-blogs/assets/css/0.styles.10c441db.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/my-blogs/" class="home-link router-link-active"><!----> <span class="site-name">我的博客</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <!----></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><!---->  <ul class="sidebar-links"><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading open"><span>Vue3.x</span> <span class="arrow down"></span></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/my-blogs/refAndReactive.html" aria-current="page" class="active sidebar-link">ref和reactive</a></li></ul></section></li><li><a href="/my-blogs/koa-onion.html" class="sidebar-link">koa洋葱模型原理</a></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h4 id="ref、reactive问题"><a href="#ref、reactive问题" class="header-anchor">#</a> ref、reactive问题</h4> <div class="language-ts extra-class"><pre class="language-ts"><code><span class="token comment">// vue2.x</span>
+data<span class="token operator">:</span> <span class="token punctuation">{</span>
+  form<span class="token operator">:</span> <span class="token punctuation">{</span>
+    name<span class="token operator">:</span> <span class="token string">''</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">,</span>
+method<span class="token operator">:</span> <span class="token punctuation">{</span>
+  <span class="token function-variable function">handleInput</span><span class="token operator">:</span> <span class="token punctuation">(</span>val<span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>form <span class="token operator">=</span> <span class="token punctuation">{</span>
+      <span class="token operator">...</span><span class="token keyword">this</span><span class="token punctuation">.</span>form<span class="token punctuation">,</span>
+      name<span class="token operator">:</span> val
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token comment">// 在vue2.x中，这样写是可以触发响应式</span>
+
+<span class="token comment">// vue3.x</span>
+<span class="token function">setup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    name<span class="token operator">:</span> <span class="token string">'张三'</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span>
+  <span class="token function">hanldeInput</span><span class="token punctuation">(</span>val<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 这样是不能触发响应式的，reactive 和 ref的内部实现都是基于proxy的，当你在vue3.x中使用以上方式更新对象的时候，虽然form改变了，但是proxy监听的那个form对象并没有改变，因此就没法触发更新</span>
+  
+    obj <span class="token operator">=</span> <span class="token punctuation">{</span>
+      <span class="token operator">...</span>obj<span class="token punctuation">,</span>
+      name<span class="token operator">:</span> <span class="token string">'李四'</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>可以用以下方式使其正确触发响应式</p> <div class="language-ts extra-class"><pre class="language-ts"><code><span class="token comment">// 1.使用Object.assign</span>
+<span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  name<span class="token operator">:</span> <span class="token string">'张三'</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+Object<span class="token punctuation">.</span><span class="token function">assign</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  name<span class="token operator">:</span> <span class="token string">'李四'</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token comment">// 2.在reactive外面包一层</span>
+<span class="token keyword">const</span> state <span class="token operator">=</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  obj<span class="token operator">:</span> <span class="token punctuation">{</span> name<span class="token operator">:</span> <span class="token string">'张三'</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+state<span class="token punctuation">.</span>obj <span class="token operator">=</span> <span class="token punctuation">{</span>
+  <span class="token operator">...</span>state<span class="token punctuation">.</span>obj<span class="token punctuation">,</span>
+  name<span class="token operator">:</span> <span class="token string">'李四'</span>
+<span class="token punctuation">}</span>
+<span class="token comment">// 3.使用 ref 替代 reactive</span>
+<span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token function">ref</span><span class="token punctuation">(</span><span class="token punctuation">{</span>name<span class="token operator">:</span> <span class="token string">'张三'</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+obj<span class="token punctuation">.</span>value <span class="token operator">=</span> <span class="token punctuation">{</span>
+  <span class="token operator">...</span>obj<span class="token punctuation">.</span>value<span class="token punctuation">,</span>
+  name<span class="token operator">:</span> <span class="token string">'李四'</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre></div></div> <footer class="page-edit"><!----> <!----></footer> <div class="page-nav"><p class="inner"><!----> <span class="next"><a href="/my-blogs/koa-onion.html">
+        koa洋葱模型原理
+      </a>
+      →
+    </span></p></div> </main></div><div class="global-ui"></div></div>
+    <script src="/my-blogs/assets/js/app.2d578ef6.js" defer></script><script src="/my-blogs/assets/js/2.af5caeff.js" defer></script><script src="/my-blogs/assets/js/9.a68b762a.js" defer></script>
+  </body>
+</html>
